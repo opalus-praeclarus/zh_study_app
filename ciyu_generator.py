@@ -36,8 +36,8 @@ SYSTEM_PROMPT = """
 """
 
 # --- 3. UI構築 ---
-st.set_page_config(page_title="中国語単語サポーター", page_icon="🇨🇳")
-st.title("🇨🇳 中国語単語サポーター")
+st.set_page_config(page_title="中国語単語ジェネレータ", page_icon="🇨🇳")
+st.title("🇨🇳 中国語単語ジェネレータ")
 st.write("テーマを入力すると、会話に役立つ単語20個を表にします。")
 
 #履歴を保持するためのセッション状態
