@@ -20,7 +20,11 @@ SYSTEM_PROMPT = """
 入力されたテーマに関連する中国語単語を20個、以下の5列のみで構成されるMarkdown表で出力してください。
 | 中国語 | 拼音 | 品詞 | 日本語訳 | 例文 |
 
-禁止事項: 「備考」欄の追加、表以外のテキスト（挨拶や説明）の出力、列の追加・削除。
+その後、最後に「### 会話のヒント」という見出しを付け、そのテーマに沿った練習用の質問（中国語と日本語訳）を3つ箇条書きで出力してください。
+
+【禁止事項】
+「備考」欄の追加、表以外のテキスト（挨拶や説明）の出力、列の追加・削除。
+質問は学習者が回答しやすい具体的な内容にすること。
 
 単語内訳: 名詞8個以上、動詞・形容詞8個以上を含むこと。
 
@@ -63,8 +67,9 @@ if st.session_state.history:
         with st.expander(f"結果: {item['theme']}", expanded=(i==0)):
             st.markdown(item['content'])
 
-        # CSV出力用の変換（簡易版）
-        csv_data = item['content'].replace('|', ',').strip()
+        # CSV出力用の変換
+        table_only = item['content'].split("###")[0]
+        csv_data = table_only.replace('|', ',').strip()
 
         st.download_button(
             label=f"「{item['theme']}」をCSVで保存",
