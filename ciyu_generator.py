@@ -13,11 +13,24 @@ client = genai.Client(api_key=API_KEY)
 
 @st.cache_data(ttl=3600)
 def get_chinese_words(theme):
-    res = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=f"{SYSTEM_PROMPT}\n\nテーマ: {theme}"
-    )
-    return res.text
+    try:
+        res = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"{SYSTEM_PROMPT}\n\nテーマ: {theme}"
+        )
+        return res.text
+    except Exception as e:
+        if "429" in str(e):
+            try:
+                res = client.models.generate_content(
+                    model="gemini-1.5-flash",
+                    contents=f"{SYSTEM_PROMPT}\n\nテーマ: {theme}"
+                )
+                return res.text
+            except Exception as e2:
+                raise Exception("全ての無料枠を使い切りました。1分ほど待ってから再度お試しください。")
+        else:
+            raise e
 
 # --- 2. システム指示 (System Instructions) ---
 SYSTEM_PROMPT = """
@@ -61,32 +74,6 @@ with st.form("input_form"):
 # 生成処理
 if submit_button and theme:
     with st.spinner('生成中...'):
-        # response_text = None
-
-        # try:
-        #     res = client.models.generate_content(
-        #         model="gemini-2.0-flash",
-        #         contents=f"{SYSTEM_PROMPT}\n\nテーマ: {theme}"
-        #     )
-        #     response_text = res.text
-
-        # except Exception as e:
-        #     if "429" in str(e):
-        #         try:
-        #             res = client.models.generate_content(
-        #                 model="gemini-1.5-flash",
-        #                 contents=f"{SYSTEM_PROMPT}\n\nテーマ: {theme}"
-        #             )
-        #             response_text = res.text
-        #         except Exception as e2:
-        #             st.error("全ての無料枠を使い切りました。少し時間を置いてください。")
-        #             st.stop()
-        #     else:
-        #         st.error(f"エラー: {e}")
-        #         st.stop()
-        # if response_text:
-        #     st.session_state.history.insert(0, {"theme": theme, "content": response_text})
-
         try:
             response_text = get_chinese_words(theme)
 
